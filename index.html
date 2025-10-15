@@ -1,11 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Our C++ HTTP Server</title>
+  <title>CSV to JSON Converter Server Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f8f8fc;
+    }
+    h2 {
+      color: #2b2d42;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    #jsonResult {
+      white-space: pre-wrap;
+      background: #e7ecf5;
+      padding: 16px;
+      border-radius: 7px;
+      margin-top: 15px;
+      box-shadow: 0 2px 7px #c3c3f3;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to Our C++ Web Server!</h1>
-    <p>This is the home page served by a multi-threaded server.</p>
-    <a href="/about">About</a>
+  <h2>CSV to JSON Converter</h2>
+  <form id="uploadForm">
+    <input type="file" id="csvFile" accept=".csv" required>
+    <button type="submit">Convert</button>
+  </form>
+  <pre id="jsonResult"></pre>
+
+  <script>
+    document.getElementById('uploadForm').onsubmit = function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('csvFile');
+      const file = fileInput.files[0];
+      if (!file) {
+        document.getElementById('jsonResult').textContent = 'Please select a CSV file.';
+        return;
+      }
+
+      file.text().then(contents => {
+        fetch('/api/csv_to_json', {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: contents
+        })
+        .then(response => response.text())
+        .then(json => {
+          document.getElementById('jsonResult').textContent = json;
+        })
+        .catch(err => {
+          document.getElementById('jsonResult').textContent = "Error processing file.";
+        });
+      });
+    };
+  </script>
 </body>
 </html>
